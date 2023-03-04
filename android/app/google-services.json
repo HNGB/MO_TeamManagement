@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "493348411624",
+    "project_id": "fuprojectteammanagement",
+    "storage_bucket": "fuprojectteammanagement.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:493348411624:android:dc075ab9e876d9d2a5115d",
+        "android_client_info": {
+          "package_name": "com.example.team_management"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "493348411624-rd81efvve37c03b4ip6kfpmbgobsum6i.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.team_management",
+            "certificate_hash": "be2bad5148d38a3e7f486113930cc22c8ec0b3de"
+          }
+        },
+        {
+          "client_id": "493348411624-6eml9qei61agsehr0orlq8a5i3077t6s.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCJQ8YTpsVCdrRE-NVfvvccMdLukvjsEpU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "493348411624-6eml9qei61agsehr0orlq8a5i3077t6s.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "493348411624-nafpif6o3rjc9mr5ook4r5u3ed4qoii9.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.teamManagement"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
