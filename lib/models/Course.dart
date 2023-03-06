@@ -4,6 +4,7 @@ class Course {
   final String keyEnroll;
   final int subId;
   final int semId;
+  final String image;
   final int status;
 
   Course(
@@ -12,6 +13,7 @@ class Course {
       required this.keyEnroll,
       required this.subId,
       required this.semId,
+      required this.image,
       required this.status});
 
   factory Course.fromJson(Map<String, dynamic> json) {
@@ -21,6 +23,7 @@ class Course {
       keyEnroll: json['keyEnroll'],
       subId: json['subId'],
       semId: json['semId'],
+      image: json['image'],
       status: json['status'],
     );
   }

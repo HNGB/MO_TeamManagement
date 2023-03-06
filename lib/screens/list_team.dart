@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:team_management/models/Course.dart';
 import 'package:team_management/screens/list_students.dart';
 import 'package:team_management/services/team_service.dart';
@@ -29,15 +30,19 @@ class ListTeamsState extends State<ListTeams> {
               child: const Text('CANCEL'),
             ),
             TextButton(
-              onPressed: () async {
-                final deleted = await teamService.deleteTeam(teamId);
-                if (deleted) {
-                  final teams = await getTeam();
-                  setState(() {
-                    listTeam = teams;
-                  });
-                }
+              onPressed: () {
+                teamService.deleteTeam(teamId).then((value) {
+                  if (value) {
+                    getTeam().then((value) => {
+                          setState(() {
+                            listTeam = value;
+                          })
+                        });
+                  }
+                });
+
                 Navigator.of(context).pop();
+                Fluttertoast.showToast(msg: "$teamName deleted!");
               },
               child: const Text('DELETE'),
             ),
@@ -100,15 +105,23 @@ class ListTeamsState extends State<ListTeams> {
                                   name!.isNotEmpty &&
                                   !listTeam
                                       .any((team) => team.teamName == name)) {
-                                final newTeam = await teamService.addTeam(
-                                    widget.course.courseId, name!);
-                                if (newTeam) {
-                                  final teams = await getTeam();
-                                  setState(() {
-                                    listTeam = teams;
-                                  });
-                                }
-                                Navigator.pop(context, name);
+                                teamService
+                                    .addTeam(widget.course.courseId, name!)
+                                    .then((value) {
+                                  if (value) {
+                                    getTeam().then((value) {
+                                      setState(() {
+                                        listTeam = value;
+                                      });
+                                    });
+                                  }
+                                  Navigator.pop(context, name);
+                                  Fluttertoast.showToast(msg: "$name added!");
+                                });
+                              } else if (listTeam
+                                  .any((team) => team.teamName == name)) {
+                                Fluttertoast.showToast(
+                                    msg: "Team name already exist!");
                               }
                             },
                           ),
@@ -116,18 +129,6 @@ class ListTeamsState extends State<ListTeams> {
                       );
                     },
                   );
-                  if (name != null &&
-                      name!.isNotEmpty &&
-                      !listTeam.any((team) => team.teamName == name)) {
-                    final newTeam = await teamService.addTeam(
-                        widget.course.courseId, name!);
-                    if (newTeam) {
-                      final teams = await getTeam();
-                      setState(() {
-                        listTeam = teams;
-                      });
-                    }
-                  }
                 },
               ),
             ),
@@ -144,10 +145,73 @@ class ListTeamsState extends State<ListTeams> {
                         title: Text(team.teamName),
                         subtitle:
                             Text("Team member: ${team.teamCount.toString()}"),
-                        trailing: IconButton(
-                          icon: const Icon(Icons.delete),
-                          onPressed: () =>
-                              _deleteTeam(team.teamName, team.teamId),
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            IconButton(
+                              icon: const Icon(Icons.edit),
+                              onPressed: () async {
+                                String? newName;
+                                newName = await showDialog<String>(
+                                  context: context,
+                                  builder: (context) {
+                                    return AlertDialog(
+                                      title: const Text('Enter New Name Team'),
+                                      content: TextField(
+                                        onChanged: (value) => newName = value,
+                                      ),
+                                      actions: <Widget>[
+                                        TextButton(
+                                          child: const Text('CANCEL'),
+                                          onPressed: () {
+                                            Navigator.pop(context);
+                                          },
+                                        ),
+                                        TextButton(
+                                          child: const Text('UPDATE'),
+                                          onPressed: () async {
+                                            if (newName != null &&
+                                                newName!.isNotEmpty &&
+                                                newName != team.teamName &&
+                                                !listTeam.any((team) =>
+                                                    team.teamName == newName)) {
+                                              teamService
+                                                  .editTeam(team, newName!)
+                                                  .then((value) {
+                                                if (value) {
+                                                  getTeam().then((value) {
+                                                    setState(() {
+                                                      listTeam = value;
+                                                    });
+                                                  });
+                                                }
+                                                Navigator.pop(context, newName);
+                                                Fluttertoast.showToast(
+                                                    msg: "$newName updated!");
+                                              });
+                                            } else if (newName != null &&
+                                                newName == team.teamName) {
+                                              Navigator.pop(context);
+                                            } else if (listTeam.any((team) =>
+                                                team.teamName == newName)) {
+                                              Fluttertoast.showToast(
+                                                  msg:
+                                                      "Team name already exist!");
+                                            }
+                                          },
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                );
+                              },
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.delete),
+                              onPressed: () =>
+                                  _deleteTeam(team.teamName, team.teamId),
+                            ),
+                          ],
                         ),
                         leading: const Icon(
                           Icons.groups_2,

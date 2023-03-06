@@ -1,7 +1,7 @@
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
-
+import 'package:intl/intl.dart';
 import '../models/Topic.dart';
 
 class TopicService {
@@ -19,10 +19,16 @@ class TopicService {
 
     if (response.statusCode == 200) {
       var topicJson = jsonDecode(response.body);
-      return Topic.fromJson(topicJson);
+      Topic t = Topic.fromJson(topicJson);
+      return t;
     } else if (response.statusCode == 204) {
       return Topic(
-          courseId: 0, topicId: 0, topicName: "No Topic Yet", status: 1);
+          courseId: 0,
+          topicId: 0,
+          topicName: "No Topic Yet",
+          status: 1,
+          deadlineDate: DateTime(0, 0, 0),
+          requirement: '');
     } else {
       throw Exception('Failed to load topic');
     }
@@ -49,12 +55,16 @@ class TopicService {
     return false;
   }
 
-  Future<bool> editTopicByTeamId(
-      int teamId, int topicId, String topicName) async {
+  Future<bool> editTopicByTeamId(int teamId, int topicId, String topicName,
+      DateTime deadlineDate, String requirements) async {
+    final f = DateFormat('yyyy-MM-dd');
+    String deadlineD = f.format(deadlineDate);
     try {
       var body = jsonEncode({
         'topicId': topicId,
         'topicName': topicName,
+        'deadlineDate': deadlineD,
+        'requirement': requirements,
       });
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');

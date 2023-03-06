@@ -71,4 +71,31 @@ class TeamService {
     }
     return false;
   }
+
+  Future<bool> editTeam(Team team, String newName) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
+      final response = await http.put(
+        Uri.parse(
+            'https://befuprojectteammanagementdemo.azurewebsites.net/api/Team/Update'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'teamId': team.teamId,
+          'teamName': newName,
+          'teamCount': team.teamCount,
+          'status': team.status
+        }),
+      );
+      if (response.statusCode == 200) {
+        return true;
+      }
+    } catch (e) {
+      print(e.toString());
+    }
+    return false;
+  }
 }

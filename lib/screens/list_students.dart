@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:team_management/models/Course.dart';
 import 'package:team_management/models/Student.dart';
+import 'package:team_management/screens/topic.dart';
 import 'package:team_management/services/student_service.dart';
 import 'package:team_management/services/topic_service.dart';
 import '../models/Team.dart';
@@ -24,7 +26,13 @@ class _ListStudentsState extends State<ListStudents> {
   List<int> selectedStudentIds = [];
   bool isEditing = false;
   String topic = '';
-  Topic tp = Topic(topicId: 0, topicName: "", courseId: 0, status: 0);
+  Topic tp = Topic(
+      topicId: 0,
+      topicName: "",
+      courseId: 0,
+      status: 0,
+      deadlineDate: DateTime(2022, 9, 9),
+      requirement: "");
   final TextEditingController textController = TextEditingController();
   Future<void> deleteStudent(Student student, int teamId) async {
     var studentName = student.stuName;
@@ -40,15 +48,21 @@ class _ListStudentsState extends State<ListStudents> {
               child: const Text('CANCEL'),
             ),
             TextButton(
-              onPressed: () async {
-                final checkDelete =
-                    await studentService.deleteStudent(student.stuId, teamId);
-                if (checkDelete) {
-                  final students = await getStudent();
-                  setState(() {
-                    listStudent = students;
-                  });
-                }
+              onPressed: () {
+                studentService
+                    .deleteStudent(student.stuId, teamId)
+                    .then((checkDelete) {
+                  if (checkDelete) {
+                    getStudent().then((students) {
+                      setState(() {
+                        listStudent = students;
+                      });
+                      Fluttertoast.showToast(
+                          msg: "$studentName has been deleted!");
+                    });
+                  }
+                });
+
                 Navigator.of(context).pop();
               },
               child: const Text('DELETE'),
@@ -107,77 +121,34 @@ class _ListStudentsState extends State<ListStudents> {
         children: <Widget>[
           Container(
             margin: const EdgeInsets.only(top: 15),
-            child: isEditing
-                ? Row(
-                    children: [
-                      Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.fromLTRB(30, 0, 30, 0),
-                          child: TextField(
-                            controller: textController,
-                            decoration: const InputDecoration(
-                              labelText: 'Update new topic',
-                            ),
-                          ),
-                        ),
-                      ),
-                      TextButton(
-                        onPressed: () async {
-                          if (tp.topicId == 0) {
-                            bool checkAdd =
-                                await topicService.createTopicByTeamId(
-                                    widget.team.teamId, textController.text);
-                            if (checkAdd) {
-                              getTopic().then((value) {
-                                setState(() {
-                                  topic = value.topicName;
-                                  tp = value;
-                                });
-                              });
-                            }
-                          } else {
-                            bool checkEdit =
-                                await topicService.editTopicByTeamId(
-                                    widget.team.teamId,
-                                    tp.topicId,
-                                    textController.text);
-                            if (checkEdit) {
-                              getTopic().then((value) {
-                                setState(() {
-                                  topic = value.topicName;
-                                  tp = value;
-                                  isEditing = false;
-                                  textController.clear();
-                                });
-                              });
-                            }
-                          }
-                        },
-                        child: const Text('SAVE'),
-                      ),
-                    ],
-                  )
-                : ElevatedButton.icon(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blueAccent,
-                    ),
-                    icon: const Icon(Icons.topic, color: Colors.white),
-                    label: Padding(
-                      padding: const EdgeInsets.fromLTRB(30, 15, 30, 15),
-                      child: Text(
-                        topic.toUpperCase(),
-                        style: const TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 17),
-                      ),
-                    ),
-                    onPressed: () {
-                      setState(() {
-                        isEditing = true;
-                      });
-                    },
+            child: ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blueAccent,
+              ),
+              icon: const Icon(Icons.topic, color: Colors.white),
+              label: Padding(
+                padding: const EdgeInsets.fromLTRB(30, 15, 30, 15),
+                child: Text(
+                  topic.toUpperCase(),
+                  style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 17),
+                ),
+              ),
+              onPressed: () {
+                // setState(() {
+                //   isEditing = true;
+                // });
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        TopicPage(topicO: tp, team: widget.team),
                   ),
+                );
+              },
+            ),
           ),
           Container(
             margin: const EdgeInsets.fromLTRB(0, 15, 0, 15),
@@ -243,15 +214,20 @@ class _ListStudentsState extends State<ListStudents> {
                                 ),
                                 TextButton(
                                   child: const Text('Add'),
-                                  onPressed: () async {
-                                    final checkAdd =
-                                        await studentService.addStudent(
-                                            widget.team.teamId,
-                                            selectedStudentIds);
-                                    if (checkAdd) {
-                                      var students = await getStudent();
-                                      updateStateListStudent(students);
-                                    }
+                                  onPressed: () {
+                                    studentService
+                                        .addStudent(widget.team.teamId,
+                                            selectedStudentIds)
+                                        .then((checkAdd) {
+                                      if (checkAdd) {
+                                        getStudent().then((students) {
+                                          updateStateListStudent(students);
+                                        });
+                                        Fluttertoast.showToast(
+                                            msg: "Add Student successful!");
+                                      }
+                                    });
+
                                     Navigator.of(context).pop();
                                   },
                                 ),

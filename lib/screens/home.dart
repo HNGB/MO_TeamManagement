@@ -152,8 +152,8 @@ class _HomePageState extends State<HomePage> {
                                   topLeft: Radius.circular(10),
                                   topRight: Radius.circular(10),
                                 ),
-                                child: Image.asset(
-                                  'assets/images/c${index + 1}.jpg',
+                                child: Image.network(
+                                  listLastCourses[index].image,
                                   fit: BoxFit.cover,
                                   width: 500,
                                   height: 120,
