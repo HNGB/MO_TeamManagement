@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:team_management/models/Team.dart';
 import 'package:team_management/models/Topic.dart';
 import 'package:team_management/services/topic_service.dart';
@@ -118,6 +119,7 @@ class _TopicPageState extends State<TopicPage> {
                         requirements != _requirements) {
                       _updateTopic(name ?? _topicName, deadline ?? _deadline,
                           requirements);
+                      Fluttertoast.showToast(msg: "Save successful!");
                     }
                     Navigator.of(context).pop();
                   },
@@ -135,6 +137,12 @@ class _TopicPageState extends State<TopicPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Topic'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.edit),
+            onPressed: () => _editTopic(context),
+          ),
+        ],
       ),
       body: ListView(
         padding: const EdgeInsets.all(16.0),
@@ -183,11 +191,6 @@ class _TopicPageState extends State<TopicPage> {
                     ),
                   ],
                 ),
-          const SizedBox(height: 16.0),
-          ElevatedButton(
-            child: const Text('Edit Topic'),
-            onPressed: () => _editTopic(context),
-          ),
         ],
       ),
     );
