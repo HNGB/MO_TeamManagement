@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:team_management/models/Course.dart';
 import 'package:team_management/screens/list_courses.dart';
+import 'package:flutter_typeahead/flutter_typeahead.dart';
 
 import '../services/course_service.dart';
 import 'list_team.dart';
@@ -76,14 +77,36 @@ class _HomePageState extends State<HomePage> {
                   ],
                 ),
                 const SizedBox(height: 50),
-                TextField(
-                  decoration: InputDecoration(
-                    prefixIcon: const Icon(Icons.search),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
+                TypeAheadField(
+                  textFieldConfiguration: TextFieldConfiguration(
+                    decoration: InputDecoration(
+                      prefixIcon: const Icon(Icons.search),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      hintText: 'Search Course',
                     ),
-                    hintText: 'Search Course',
                   ),
+                  suggestionsCallback: (pattern) {
+                    return listCourses
+                        .where((course) => course.courseName
+                            .toLowerCase()
+                            .contains(pattern.toLowerCase()))
+                        .toList();
+                  },
+                  itemBuilder: (context, Course course) {
+                    return ListTile(
+                      title: Text(course.courseName),
+                    );
+                  },
+                  onSuggestionSelected: (Course course) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ListTeams(course: course),
+                      ),
+                    );
+                  },
                 ),
                 const SizedBox(height: 70),
                 Row(
