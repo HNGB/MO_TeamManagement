@@ -133,161 +133,166 @@ class _ListStudentsState extends State<ListStudents> {
       });
     }
 
-    return Scaffold(
-      body: Column(
-        children: <Widget>[
-          Container(
-            margin: const EdgeInsets.only(top: 15),
-            child: ElevatedButton.icon(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blueAccent,
-              ),
-              icon: const Icon(Icons.topic, color: Colors.white),
-              label: Padding(
-                padding: const EdgeInsets.fromLTRB(30, 15, 30, 15),
-                child: Text(
-                  topic.toUpperCase(),
-                  style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 17),
+    return WillPopScope(
+        onWillPop: () async {
+          Navigator.pop(context, listStudent.length);
+          return true;
+        },
+        child: Scaffold(
+          body: Column(
+            children: <Widget>[
+              Container(
+                margin: const EdgeInsets.only(top: 15),
+                child: ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blueAccent,
+                  ),
+                  icon: const Icon(Icons.topic, color: Colors.white),
+                  label: Padding(
+                    padding: const EdgeInsets.fromLTRB(30, 15, 30, 15),
+                    child: Text(
+                      topic.toUpperCase(),
+                      style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 17),
+                    ),
+                  ),
+                  onPressed: () {
+                    // setState(() {
+                    //   isEditing = true;
+                    // });
+                    updateTopicName(context);
+                  },
                 ),
               ),
-              onPressed: () {
-                // setState(() {
-                //   isEditing = true;
-                // });
-                updateTopicName(context);
-              },
-            ),
-          ),
-          Container(
-            margin: const EdgeInsets.fromLTRB(0, 15, 0, 15),
-            padding: const EdgeInsets.fromLTRB(120, 5, 120, 5),
-            height: 50.0,
-            child: SizedBox.expand(
-              child: ElevatedButton.icon(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.white,
-                ),
-                icon: const Icon(Icons.add, color: Colors.blue),
-                label: const Text(
-                  'Add Student',
-                  style: TextStyle(color: Colors.blue),
-                ),
-                onPressed: () {
-                  // Lấy danh sách sinh viên không thuộc nhóm
-                  getStudentNonTeam().then((value) {
-                    updateStateListStudentNonTeam(value);
-                    showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return StatefulBuilder(
-                          builder: (context, setState) {
-                            return AlertDialog(
-                              title: const Text('Add Student'),
-                              content: Container(
-                                width: double.maxFinite,
-                                child: ListView(
-                                  shrinkWrap: true,
-                                  children: nonTeamStudents
-                                      .asMap()
-                                      .entries
-                                      .map((entry) {
-                                    int index = entry.key;
-                                    Student student = entry.value;
-                                    return CheckboxListTile(
-                                      title: Text(student.stuName),
-                                      subtitle: Text(student.stuCode),
-                                      value: checkedStudents[index],
-                                      onChanged: (value) {
-                                        setState(() {
-                                          checkedStudents[index] = value!;
-                                          if (checkedStudents[index]) {
-                                            selectedStudentIds
-                                                .add(student.stuId);
-                                          } else {
-                                            selectedStudentIds
-                                                .remove(student.stuId);
+              Container(
+                margin: const EdgeInsets.fromLTRB(0, 15, 0, 15),
+                padding: const EdgeInsets.fromLTRB(120, 5, 120, 5),
+                height: 50.0,
+                child: SizedBox.expand(
+                  child: ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                    ),
+                    icon: const Icon(Icons.add, color: Colors.blue),
+                    label: const Text(
+                      'Add Student',
+                      style: TextStyle(color: Colors.blue),
+                    ),
+                    onPressed: () {
+                      // Lấy danh sách sinh viên không thuộc nhóm
+                      getStudentNonTeam().then((value) {
+                        updateStateListStudentNonTeam(value);
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return StatefulBuilder(
+                              builder: (context, setState) {
+                                return AlertDialog(
+                                  title: const Text('Add Student'),
+                                  content: Container(
+                                    width: double.maxFinite,
+                                    child: ListView(
+                                      shrinkWrap: true,
+                                      children: nonTeamStudents
+                                          .asMap()
+                                          .entries
+                                          .map((entry) {
+                                        int index = entry.key;
+                                        Student student = entry.value;
+                                        return CheckboxListTile(
+                                          title: Text(student.stuName),
+                                          subtitle: Text(student.stuCode),
+                                          value: checkedStudents[index],
+                                          onChanged: (value) {
+                                            setState(() {
+                                              checkedStudents[index] = value!;
+                                              if (checkedStudents[index]) {
+                                                selectedStudentIds
+                                                    .add(student.stuId);
+                                              } else {
+                                                selectedStudentIds
+                                                    .remove(student.stuId);
+                                              }
+                                            });
+                                          },
+                                        );
+                                      }).toList(),
+                                    ),
+                                  ),
+                                  actions: <Widget>[
+                                    TextButton(
+                                      child: const Text('Cancel'),
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                      },
+                                    ),
+                                    TextButton(
+                                      child: const Text('Add'),
+                                      onPressed: () {
+                                        studentService
+                                            .addStudent(widget.team.teamId,
+                                                selectedStudentIds)
+                                            .then((checkAdd) {
+                                          if (checkAdd) {
+                                            getStudent().then((students) {
+                                              updateStateListStudent(students);
+                                            });
+                                            Fluttertoast.showToast(
+                                                msg: "Add Student successful!");
                                           }
                                         });
-                                      },
-                                    );
-                                  }).toList(),
-                                ),
-                              ),
-                              actions: <Widget>[
-                                TextButton(
-                                  child: const Text('Cancel'),
-                                  onPressed: () {
-                                    Navigator.of(context).pop();
-                                  },
-                                ),
-                                TextButton(
-                                  child: const Text('Add'),
-                                  onPressed: () {
-                                    studentService
-                                        .addStudent(widget.team.teamId,
-                                            selectedStudentIds)
-                                        .then((checkAdd) {
-                                      if (checkAdd) {
-                                        getStudent().then((students) {
-                                          updateStateListStudent(students);
-                                        });
-                                        Fluttertoast.showToast(
-                                            msg: "Add Student successful!");
-                                      }
-                                    });
 
-                                    Navigator.of(context).pop();
-                                  },
-                                ),
-                              ],
+                                        Navigator.of(context).pop();
+                                      },
+                                    ),
+                                  ],
+                                );
+                              },
                             );
                           },
                         );
-                      },
-                    );
-                  });
+                      });
 
-                  // Hiển thị danh sách sinh viên không thuộc nhóm trên một popup
-                },
+                      // Hiển thị danh sách sinh viên không thuộc nhóm trên một popup
+                    },
+                  ),
+                ),
               ),
-            ),
-          ),
-          Expanded(
-            child: Container(
-              color: Colors.grey[200],
-              padding: const EdgeInsets.all(10),
-              child: ListView(
-                children: <Widget>[
-                  for (var student in listStudent)
-                    Card(
-                      child: ListTile(
-                        title: Text(student.stuName),
-                        subtitle: Text(student.stuCode),
-                        trailing: IconButton(
-                          icon: const Icon(Icons.delete),
-                          onPressed: () {
-                            deleteStudent(student, widget.team.teamId);
-                          },
+              Expanded(
+                child: Container(
+                  color: Colors.grey[200],
+                  padding: const EdgeInsets.all(10),
+                  child: ListView(
+                    children: <Widget>[
+                      for (var student in listStudent)
+                        Card(
+                          child: ListTile(
+                            title: Text(student.stuName),
+                            subtitle: Text(student.stuCode),
+                            trailing: IconButton(
+                              icon: const Icon(Icons.delete),
+                              onPressed: () {
+                                deleteStudent(student, widget.team.teamId);
+                              },
+                            ),
+                            leading: const Icon(
+                              Icons.person_3,
+                              size: 30,
+                            ),
+                          ),
                         ),
-                        leading: const Icon(
-                          Icons.person_3,
-                          size: 30,
-                        ),
-                      ),
-                    ),
-                ],
+                    ],
+                  ),
+                ),
               ),
-            ),
+            ],
           ),
-        ],
-      ),
-      appBar: AppBar(
-        title: Text(widget.team.teamName),
-      ),
-    );
+          appBar: AppBar(
+            title: Text(widget.team.teamName),
+          ),
+        ));
   }
 
   Future<List<Student>> getStudent() async {

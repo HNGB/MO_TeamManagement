@@ -52,6 +52,22 @@ class ListTeamsState extends State<ListTeams> {
     );
   }
 
+  void updateTeamMember(BuildContext context, Team team) async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ListStudents(team: team, course: widget.course),
+      ),
+    );
+    if (result != null) {
+      getTeam().then((teams) {
+        setState(() {
+          listTeam = teams;
+        });
+      });
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -218,13 +234,7 @@ class ListTeamsState extends State<ListTeams> {
                           size: 30,
                         ),
                         onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => ListStudents(
-                                  team: team, course: widget.course),
-                            ),
-                          );
+                          updateTeamMember(context, team);
                         },
                       ),
                     ),
