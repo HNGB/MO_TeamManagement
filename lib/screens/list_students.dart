@@ -34,6 +34,23 @@ class _ListStudentsState extends State<ListStudents> {
       deadlineDate: DateTime(2022, 9, 9),
       requirement: "");
   final TextEditingController textController = TextEditingController();
+  void updateTopicName(BuildContext context) async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => TopicPage(topicO: tp, team: widget.team),
+      ),
+    );
+    if (result != null) {
+      getTopic().then((value) {
+        setState(() {
+          topic = result;
+          tp = value;
+        });
+      });
+    }
+  }
+
   Future<void> deleteStudent(Student student, int teamId) async {
     var studentName = student.stuName;
     return showDialog(
@@ -140,13 +157,7 @@ class _ListStudentsState extends State<ListStudents> {
                 // setState(() {
                 //   isEditing = true;
                 // });
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        TopicPage(topicO: tp, team: widget.team),
-                  ),
-                );
+                updateTopicName(context);
               },
             ),
           ),

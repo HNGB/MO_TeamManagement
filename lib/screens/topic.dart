@@ -134,65 +134,70 @@ class _TopicPageState extends State<TopicPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Topic'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.edit),
-            onPressed: () => _editTopic(context),
-          ),
-        ],
-      ),
-      body: ListView(
-        padding: const EdgeInsets.all(16.0),
-        children: <Widget>[
-          Center(
-            child: Text(
-              _topicName.toUpperCase(),
-              style: const TextStyle(
-                fontSize: 24.0,
-                fontWeight: FontWeight.bold,
+    return WillPopScope(
+        onWillPop: () async {
+          Navigator.pop(context, _topicName);
+          return true;
+        },
+        child: Scaffold(
+          appBar: AppBar(
+            title: const Text('Topic'),
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.edit),
+                onPressed: () => _editTopic(context),
               ),
-            ),
+            ],
           ),
-          const SizedBox(height: 16.0),
-          Text(
-            _deadline == null
-                ? 'No Deadline'
-                : 'Deadline: ${_deadline!.day}/${_deadline!.month}/${_deadline!.year}',
-            style: TextStyle(
-              fontSize: 18.0,
-              color: Colors.grey[600],
-            ),
-          ),
-          const SizedBox(height: 16.0),
-          _requirements.isEmpty
-              ? const Text(
-                  'No requirements yet.',
-                  style: TextStyle(
-                    fontStyle: FontStyle.italic,
+          body: ListView(
+            padding: const EdgeInsets.all(16.0),
+            children: <Widget>[
+              Center(
+                child: Text(
+                  _topicName.toUpperCase(),
+                  style: const TextStyle(
+                    fontSize: 24.0,
+                    fontWeight: FontWeight.bold,
                   ),
-                )
-              : Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Requirements:',
-                      style: TextStyle(
-                        fontSize: 18.0,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 8.0),
-                    Text(
-                      _requirements,
-                      style: const TextStyle(fontSize: 16.0),
-                    ),
-                  ],
                 ),
-        ],
-      ),
-    );
+              ),
+              const SizedBox(height: 16.0),
+              Text(
+                _deadline == null
+                    ? 'No Deadline'
+                    : 'Deadline: ${_deadline!.day}/${_deadline!.month}/${_deadline!.year}',
+                style: TextStyle(
+                  fontSize: 18.0,
+                  color: Colors.grey[600],
+                ),
+              ),
+              const SizedBox(height: 16.0),
+              _requirements.isEmpty
+                  ? const Text(
+                      'No requirements yet.',
+                      style: TextStyle(
+                        fontStyle: FontStyle.italic,
+                      ),
+                    )
+                  : Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Requirements:',
+                          style: TextStyle(
+                            fontSize: 18.0,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 8.0),
+                        Text(
+                          _requirements,
+                          style: const TextStyle(fontSize: 16.0),
+                        ),
+                      ],
+                    ),
+            ],
+          ),
+        ));
   }
 }
