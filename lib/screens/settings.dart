@@ -72,10 +72,6 @@ class SettingPage extends StatelessWidget {
                   );
                 },
               );
-              SharedPreferences preferences =
-                  await SharedPreferences.getInstance();
-              String? topic = preferences.getString("topic");
-              await FirebaseMessaging.instance.unsubscribeFromTopic(topic!);
               provider.logout().then((_) {
                 Navigator.of(context).pop();
               });

@@ -7,7 +7,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:team_management/screens/start.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 
-import '../firebase/forGroundLocalNotification.dart';
+import 'firebase/forGroundLocalNotification.dart';
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   // If you're going to use other Firebase services in the background, such as Firestore,

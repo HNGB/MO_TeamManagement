@@ -48,6 +48,9 @@ class GoogleSignInProvider extends ChangeNotifier {
   }
 
   Future logout() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    String? topic = preferences.getString("topic");
+    await FirebaseMessaging.instance.unsubscribeFromTopic(topic!);
     await googleSignIn.disconnect();
     FirebaseAuth.instance.signOut();
   }
